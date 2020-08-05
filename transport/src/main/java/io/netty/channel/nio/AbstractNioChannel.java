@@ -78,6 +78,7 @@ public abstract class AbstractNioChannel extends AbstractChannel {
      */
     protected AbstractNioChannel(Channel parent, SelectableChannel ch, int readInterestOp) {
         super(parent);
+        //持有的 Java 原生 NIO 的 Channel 对象。
         this.ch = ch;
         this.readInterestOp = readInterestOp;
         try {
@@ -377,6 +378,7 @@ public abstract class AbstractNioChannel extends AbstractChannel {
         boolean selected = false;
         for (;;) {
             try {
+                //获得 Java 原生 NIO 的 Channel 对象,注册 原生 NIO 的 Channel 对象到 Selector 对象上
                 selectionKey = javaChannel().register(eventLoop().unwrappedSelector(), 0, this);
                 return;
             } catch (CancelledKeyException e) {

@@ -28,8 +28,12 @@ import static io.netty.util.concurrent.AbstractEventExecutor.*;
 
 /**
  * Abstract base class for {@link EventExecutorGroup} implementations.
+ *
+ * next() 获取一个EventExecutor执行任务接口
  */
 public abstract class AbstractEventExecutorGroup implements EventExecutorGroup {
+
+    //#submit(...) 方法，提交一个普通任务到 EventExecutor 中
     @Override
     public Future<?> submit(Runnable task) {
         return next().submit(task);
@@ -45,6 +49,7 @@ public abstract class AbstractEventExecutorGroup implements EventExecutorGroup {
         return next().submit(task);
     }
 
+    //#schedule(...) 方法，提交一个定时任务到 EventExecutor 中
     @Override
     public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit) {
         return next().schedule(command, delay, unit);
@@ -65,6 +70,7 @@ public abstract class AbstractEventExecutorGroup implements EventExecutorGroup {
         return next().scheduleWithFixedDelay(command, initialDelay, delay, unit);
     }
 
+    //#shutdown(...) 方法，关闭 EventExecutorGroup
     @Override
     public Future<?> shutdownGracefully() {
         return shutdownGracefully(DEFAULT_SHUTDOWN_QUIET_PERIOD, DEFAULT_SHUTDOWN_TIMEOUT, TimeUnit.SECONDS);
@@ -87,6 +93,7 @@ public abstract class AbstractEventExecutorGroup implements EventExecutorGroup {
         return Collections.emptyList();
     }
 
+    // #invokeAll(...) 方法，在 EventExecutor 中执行多个普通任务
     @Override
     public <T> List<java.util.concurrent.Future<T>> invokeAll(Collection<? extends Callable<T>> tasks)
             throws InterruptedException {
@@ -99,6 +106,7 @@ public abstract class AbstractEventExecutorGroup implements EventExecutorGroup {
         return next().invokeAll(tasks, timeout, unit);
     }
 
+    //#invokeAll(...) 方法，在 EventExecutor 中执行多个普通任务，有一个执行完成即可。
     @Override
     public <T> T invokeAny(Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException {
         return next().invokeAny(tasks);
@@ -110,6 +118,7 @@ public abstract class AbstractEventExecutorGroup implements EventExecutorGroup {
         return next().invokeAny(tasks, timeout, unit);
     }
 
+    // #execute(...) 方法，在 EventExecutor 中执行一个普通任务
     @Override
     public void execute(Runnable command) {
         next().execute(command);

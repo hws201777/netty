@@ -16,8 +16,8 @@
 package io.netty.channel.nio;
 
 import io.netty.channel.Channel;
-import io.netty.channel.EventLoop;
 import io.netty.channel.DefaultSelectStrategyFactory;
+import io.netty.channel.EventLoop;
 import io.netty.channel.EventLoopTaskQueueFactory;
 import io.netty.channel.MultithreadEventLoopGroup;
 import io.netty.channel.SelectStrategyFactory;

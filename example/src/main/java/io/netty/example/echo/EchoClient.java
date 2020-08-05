@@ -52,6 +52,7 @@ public final class EchoClient {
         }
 
         // Configure the client.
+        // 创建一个 EventLoopGroup 对象
         EventLoopGroup group = new NioEventLoopGroup();
         try {
             Bootstrap b = new Bootstrap();

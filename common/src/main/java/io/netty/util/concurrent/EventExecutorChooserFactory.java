@@ -19,23 +19,29 @@ import io.netty.util.internal.UnstableApi;
 
 /**
  * Factory that creates new {@link EventExecutorChooser}s.
+ * EventExecutorChooser 工厂接口
  */
 @UnstableApi
 public interface EventExecutorChooserFactory {
 
     /**
      * Returns a new {@link EventExecutorChooser}.
+     * 创建一个EventExecutorChooser对象,
+     * 不同的选择器拥有不同的选择策略(是否是2的幂次数),由executors 个数决定
+     * 不同的next()实现
      */
     EventExecutorChooser newChooser(EventExecutor[] executors);
 
     /**
      * Chooses the next {@link EventExecutor} to use.
+     * 选择器接口
      */
     @UnstableApi
     interface EventExecutorChooser {
 
         /**
          * Returns the new {@link EventExecutor} to use.
+         * 选择一个EventExecutor
          */
         EventExecutor next();
     }

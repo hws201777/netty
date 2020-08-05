@@ -30,10 +30,29 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public abstract class MultithreadEventExecutorGroup extends AbstractEventExecutorGroup {
 
+    /**
+     * EventExecutor数组
+     */
     private final EventExecutor[] children;
+
+    /**
+     * 只读EventExecutor集合
+     */
     private final Set<EventExecutor> readonlyChildren;
+
+    /**
+     * 已终止的 EventExecutor 数量
+     */
     private final AtomicInteger terminatedChildren = new AtomicInteger();
+
+    /**
+     * 用于终止 EventExecutor 的异步 Future
+     */
     private final Promise<?> terminationFuture = new DefaultPromise(GlobalEventExecutor.INSTANCE);
+
+    /**
+     * EventExecutor 选择器
+     */
     private final EventExecutorChooserFactory.EventExecutorChooser chooser;
 
     /**
@@ -72,26 +91,30 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
             throw new IllegalArgumentException(String.format("nThreads: %d (expected: > 0)", nThreads));
         }
 
+        //创建执行器
         if (executor == null) {
+            //返回线程前置任务工厂,用于创建EventExecutor
             executor = new ThreadPerTaskExecutor(newDefaultThreadFactory());
         }
-
+        //创建EventExecutor 数组
         children = new EventExecutor[nThreads];
 
         for (int i = 0; i < nThreads; i ++) {
-            boolean success = false;
+            boolean success = false; //是否创建成功
             try {
+                //创建对象
                 children[i] = newChild(executor, args);
-                success = true;
+                success = true; //标记成功
             } catch (Exception e) {
                 // TODO: Think about if this is a good exception type
                 throw new IllegalStateException("failed to create a child event loop", e);
             } finally {
+                //创建失败,关闭已创建的EventExecutor 数组
                 if (!success) {
                     for (int j = 0; j < i; j ++) {
                         children[j].shutdownGracefully();
                     }
-
+                    // 确保所有已创建的 EventExecutor 已关闭
                     for (int j = 0; j < i; j ++) {
                         EventExecutor e = children[j];
                         try {
@@ -108,6 +131,7 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
             }
         }
 
+        //创建EventExecutor选择器
         chooser = chooserFactory.newChooser(children);
 
         final FutureListener<Object> terminationListener = new FutureListener<Object>() {
@@ -119,15 +143,17 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
             }
         };
 
+        //创建监听,用于EventExecutor终止时的监听
         for (EventExecutor e: children) {
             e.terminationFuture().addListener(terminationListener);
         }
-
+        //创建不可变( 只读 )的 EventExecutor 数组
         Set<EventExecutor> childrenSet = new LinkedHashSet<EventExecutor>(children.length);
         Collections.addAll(childrenSet, children);
         readonlyChildren = Collections.unmodifiableSet(childrenSet);
     }
 
+    //创建线程工厂
     protected ThreadFactory newDefaultThreadFactory() {
         return new DefaultThreadFactory(getClass());
     }
